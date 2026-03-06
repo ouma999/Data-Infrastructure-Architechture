@@ -1,32 +1,28 @@
 // =============================================
 // config/database.js
 // =============================================
-// This file manages the connection to SQL Server
-// using Windows Authentication (no username/password needed)
+// Supports both LOCAL and AWS SQL Server
+// Change .env values to switch between them
 // =============================================
-
 const sql = require('mssql');
 require('dotenv').config();
 
 const dbConfig = {
-  // Pulling the server and database from .env
-  server: process.env.DB_SERVER, 
+  server:   process.env.DB_SERVER,
   database: process.env.DB_NAME,
-  
-  // ADD THESE TWO LINES:
-  user: process.env.DB_USER,      
-  password: process.env.DB_PASSWORD, 
+  user:     process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port:     1433,
 
   options: {
-    encrypt: false, // Set to false for local dev
-    trustServerCertificate: true, // Required for local connections
-    enableArithAbort: true,
-    // Ensure this is NOT set to true when using user/password
-    integratedSecurity: false 
+    encrypt:                process.env.NODE_ENV === 'production', // true on AWS, false on local
+    trustServerCertificate: process.env.NODE_ENV !== 'production', // true on local, false on AWS
+    enableArithAbort:       true,
+    integratedSecurity:     false
   },
   pool: {
-    max: 10,
-    min: 0,
+    max:              10,
+    min:              0,
     idleTimeoutMillis: 30000
   }
 };
@@ -37,9 +33,7 @@ async function connectDB() {
   try {
     if (pool) return pool;
     console.log(`Attempting to connect to ${dbConfig.database} as ${dbConfig.user}...`);
-    
     pool = await sql.connect(dbConfig);
-    
     console.log('✅ Connected to SQL Server successfully!');
     return pool;
   } catch (err) {
