@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SMARTLINKS — Data Science Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:   #0B1C2E;
+    --navy2:  #122338;
+    --gold:   #C8963E;
+    --gold2:  #E0B060;
+    --cream:  #F5F0E8;
+    --white:  #FFFFFF;
+    --gray:   #6B7A8D;
+    --light:  #EEF2F7;
+    --border: rgba(200,150,62,0.18);
+    --shadow: 0 8px 40px rgba(11,28,46,0.13);
+    --radius: 4px;
+    --font-head: 'Playfair Display', serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: var(--font-body); background: var(--white); color: var(--navy); overflow-x: hidden; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--light); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    background: rgba(11,28,46,0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 5%;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 68px;
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 30px rgba(0,0,0,0.3); }
+  .nav-logo {
+    font-family: var(--font-head); font-size: 1.6rem; font-weight: 700;
+    color: var(--white); letter-spacing: 0.02em; text-decoration: none;
+  }
+  .nav-logo span { color: var(--gold); }
+  .nav-links { display: flex; gap: 2rem; list-style: none; }
+  .nav-links a {
+    color: rgba(255,255,255,0.75); text-decoration: none;
+    font-size: 0.875rem; font-weight: 500; letter-spacing: 0.05em;
+    text-transform: uppercase; transition: color 0.2s;
+    cursor: pointer;
+  }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+  .nav-cta {
+    background: var(--gold); color: var(--navy); border: none;
+    padding: 0.55rem 1.4rem; border-radius: var(--radius);
+    font-family: var(--font-body); font-size: 0.875rem; font-weight: 600;
+    cursor: pointer; transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.04em;
+  }
+  .nav-cta:hover { background: var(--gold2); transform: translateY(-1px); }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+  .hamburger span { width: 24px; height: 2px; background: var(--white); transition: 0.3s; }
+
+  /* ── PAGES ── */
+  .page { display: none; min-height: 100vh; padding-top: 68px; }
+  .page.active { display: block; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh; padding-top: 68px;
+    background: var(--navy);
+    display: flex; align-items: center;
+    position: relative; overflow: hidden;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(200,150,62,0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,150,62,0.06) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-glow {
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,150,62,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-inner {
+    position: relative; z-index: 2;
+    max-width: 1200px; margin: 0 auto; padding: 0 5%;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;
+  }
+  .hero-tag {
+    display: inline-block;
+    background: rgba(200,150,62,0.15); color: var(--gold);
+    border: 1px solid rgba(200,150,62,0.3);
+    padding: 0.35rem 1rem; border-radius: 2px;
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em;
+    text-transform: uppercase; margin-bottom: 1.5rem;
+  }
+  .hero-title {
+    font-family: var(--font-head); font-size: clamp(2.4rem, 4vw, 3.6rem);
+    font-weight: 700; color: var(--white); line-height: 1.18;
+    margin-bottom: 1.5rem;
+  }
+  .hero-title em { color: var(--gold); font-style: normal; }
+  .hero-sub {
+    color: rgba(255,255,255,0.65); font-size: 1.05rem; line-height: 1.75;
+    margin-bottom: 2.5rem; max-width: 480px;
+  }
+  .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--gold); color: var(--navy);
+    border: none; padding: 0.85rem 2rem; border-radius: var(--radius);
+    font-family: var(--font-body); font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+  }
+  .btn-primary:hover { background: var(--gold2); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(200,150,62,0.35); }
+  .btn-outline {
+    background: transparent; color: var(--white);
+    border: 1px solid rgba(255,255,255,0.3); padding: 0.85rem 2rem;
+    border-radius: var(--radius); font-family: var(--font-body);
+    font-size: 0.9rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+  .hero-stats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(200,150,62,0.15);
+    border-radius: 6px; padding: 1.8rem;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .stat-card:hover { border-color: rgba(200,150,62,0.4); transform: translateY(-3px); }
+  .stat-num {
+    font-family: var(--font-head); font-size: 2.6rem; font-weight: 700;
+    color: var(--gold); line-height: 1;
+  }
+  .stat-label { color: rgba(255,255,255,0.55); font-size: 0.85rem; margin-top: 0.4rem; }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 5%; }
+  .section-tag {
+    display: inline-block; color: var(--gold);
+    font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em;
+    text-transform: uppercase; margin-bottom: 0.75rem;
+  }
+  .section-title {
+    font-family: var(--font-head); font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 700; color: var(--navy); line-height: 1.25;
+    margin-bottom: 1rem;
+  }
+  .section-sub {
+    color: var(--gray); font-size: 1rem; line-height: 1.7;
+    max-width: 560px;
+  }
+  .section-header { margin-bottom: 3.5rem; }
+  .section-header.centered { text-align: center; }
+  .section-header.centered .section-sub { margin: 0 auto; }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  /* ── SERVICES ── */
+  #services-section { background: var(--light); }
+  .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px,1fr)); gap: 1.5rem; }
+  .service-card {
+    background: var(--white); border: 1px solid #DDE4ED;
+    border-radius: 6px; padding: 2rem;
+    transition: all 0.3s; cursor: pointer;
+    position: relative; overflow: hidden;
+  }
+  .service-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold2));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .service-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); border-color: transparent; }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-icon {
+    width: 48px; height: 48px; background: rgba(200,150,62,0.1);
+    border-radius: 6px; display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.25rem;
+  }
+  .service-title { font-family: var(--font-head); font-size: 1.2rem; font-weight: 600; margin-bottom: 0.6rem; color: var(--navy); }
+  .service-desc { color: var(--gray); font-size: 0.9rem; line-height: 1.65; }
+  .service-badge {
+    display: inline-block; margin-top: 1rem;
+    background: rgba(200,150,62,0.1); color: var(--gold);
+    padding: 0.2rem 0.7rem; border-radius: 2px;
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .loading-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; }
+  .skeleton {
+    background: linear-gradient(90deg, #e8ecf0 25%, #f5f7fa 50%, #e8ecf0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 6px;
+  }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  .skeleton-card { height: 180px; }
+
+  /* ── CASE STUDIES ── */
+  .cases-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 1.5rem; }
+  .case-card {
+    background: var(--white); border: 1px solid #DDE4ED;
+    border-radius: 6px; overflow: hidden;
+    transition: all 0.3s; cursor: pointer;
+  }
+  .case-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); border-color: transparent; }
+  .case-banner {
+    height: 140px;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3.5rem; position: relative; overflow: hidden;
+  }
+  .case-banner::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(200,150,62,0.15), transparent);
+  }
+  .case-body { padding: 1.5rem; }
+  .case-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+  .tag-pill {
+    background: var(--light); color: var(--gray);
+    padding: 0.2rem 0.65rem; border-radius: 2px;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 0.04em;
+  }
+  .case-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; line-height: 1.35; }
+  .case-client { color: var(--gray); font-size: 0.85rem; }
+  .case-metric {
+    margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--light);
+    color: var(--gold); font-size: 0.85rem; font-weight: 600;
+  }
+
+  /* ── POSTS ── */
+  #insights-section { background: var(--light); }
+  .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap: 1.5rem; }
+  .post-card {
+    background: var(--white); border: 1px solid #DDE4ED;
+    border-radius: 6px; overflow: hidden;
+    transition: all 0.3s; cursor: pointer;
+  }
+  .post-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); border-color: transparent; }
+  .post-thumb {
+    height: 180px;
+    background: linear-gradient(135deg, var(--navy) 60%, var(--gold) 200%);
+    display: flex; align-items: flex-end; padding: 1rem;
+    position: relative;
+  }
+  .post-category {
+    background: var(--gold); color: var(--navy);
+    padding: 0.25rem 0.75rem; border-radius: 2px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .post-body { padding: 1.5rem; }
+  .post-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.6rem; line-height: 1.35; }
+  .post-excerpt { color: var(--gray); font-size: 0.875rem; line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .post-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--light); }
+  .post-author { color: var(--gray); font-size: 0.8rem; }
+  .post-read { color: var(--gray); font-size: 0.8rem; }
+
+  /* ── TEAM ── */
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 1.5rem; }
+  .team-card {
+    background: var(--white); border: 1px solid #DDE4ED;
+    border-radius: 6px; padding: 2rem 1.5rem; text-align: center;
+    transition: all 0.3s;
+  }
+  .team-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+  .team-avatar {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-head); font-size: 1.6rem; font-weight: 700;
+    color: var(--gold); margin: 0 auto 1rem;
+    border: 3px solid rgba(200,150,62,0.2);
+  }
+  .team-name { font-family: var(--font-head); font-size: 1.1rem; font-weight: 600; color: var(--navy); }
+  .team-role { color: var(--gold); font-size: 0.82rem; font-weight: 500; margin-top: 0.25rem; }
+  .team-dept { color: var(--gray); font-size: 0.8rem; margin-top: 0.2rem; }
+  .team-bio { color: var(--gray); font-size: 0.82rem; line-height: 1.6; margin-top: 0.75rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .leadership-badge {
+    display: inline-block; margin-top: 0.5rem;
+    background: rgba(200,150,62,0.1); color: var(--gold);
+    padding: 0.15rem 0.6rem; border-radius: 2px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em;
+  }
+
+  /* ── TESTIMONIALS ── */
+  #testimonials-section { background: var(--navy); }
+  #testimonials-section .section-title { color: var(--white); }
+  #testimonials-section .section-sub { color: rgba(255,255,255,0.5); }
+  .testi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px,1fr)); gap: 1.5rem; }
+  .testi-card {
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(200,150,62,0.15);
+    border-radius: 6px; padding: 2rem;
+    transition: all 0.3s;
+  }
+  .testi-card:hover { border-color: rgba(200,150,62,0.35); background: rgba(255,255,255,0.06); }
+  .testi-stars { color: var(--gold); font-size: 1rem; margin-bottom: 1rem; letter-spacing: 2px; }
+  .testi-quote { color: rgba(255,255,255,0.8); font-size: 0.95rem; line-height: 1.75; font-style: italic; margin-bottom: 1.5rem; }
+  .testi-quote::before { content: '"'; font-family: var(--font-head); font-size: 2rem; color: var(--gold); line-height: 0; vertical-align: -0.5rem; margin-right: 4px; }
+  .testi-author { color: var(--white); font-weight: 600; font-size: 0.9rem; }
+  .testi-role { color: rgba(255,255,255,0.45); font-size: 0.82rem; margin-top: 0.2rem; }
+
+  /* ── CONTACT / LEAD FORM ── */
+  #contact-section { background: var(--light); }
+  .contact-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; align-items: start; }
+  .contact-info h2 { font-family: var(--font-head); font-size: 2rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem; }
+  .contact-info p { color: var(--gray); line-height: 1.75; margin-bottom: 2rem; }
+  .contact-detail { display: flex; gap: 0.75rem; align-items: flex-start; margin-bottom: 1.25rem; }
+  .contact-icon { width: 40px; height: 40px; background: rgba(200,150,62,0.1); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .contact-text strong { display: block; color: var(--navy); font-size: 0.875rem; font-weight: 600; }
+  .contact-text span { color: var(--gray); font-size: 0.85rem; }
+  .contact-form { background: var(--white); border: 1px solid #DDE4ED; border-radius: 8px; padding: 2.5rem; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--navy); margin-bottom: 0.4rem; letter-spacing: 0.03em; }
+  .form-group input, .form-group select, .form-group textarea {
+    width: 100%; padding: 0.75rem 1rem;
+    border: 1px solid #DDE4ED; border-radius: var(--radius);
+    font-family: var(--font-body); font-size: 0.9rem; color: var(--navy);
+    background: var(--white); transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--gold); }
+  .form-group textarea { resize: vertical; min-height: 110px; }
+  .form-submit {
+    width: 100%; background: var(--navy); color: var(--white);
+    border: none; padding: 0.95rem; border-radius: var(--radius);
+    font-family: var(--font-body); font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+    margin-top: 0.5rem;
+  }
+  .form-submit:hover { background: var(--gold); color: var(--navy); }
+  .form-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+  .form-message { margin-top: 1rem; padding: 0.75rem 1rem; border-radius: var(--radius); font-size: 0.875rem; font-weight: 500; }
+  .form-message.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .form-message.error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+  /* ── ABOUT PAGE ── */
+  .about-hero {
+    background: var(--navy); padding: 6rem 5%;
+    text-align: center;
+  }
+  .about-hero h1 { font-family: var(--font-head); font-size: clamp(2rem,4vw,3rem); color: var(--white); margin-bottom: 1rem; }
+  .about-hero p { color: rgba(255,255,255,0.6); font-size: 1.05rem; max-width: 600px; margin: 0 auto; line-height: 1.75; }
+  .about-values { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 1.5rem; }
+  .value-card {
+    background: var(--white); border: 1px solid #DDE4ED;
+    border-radius: 6px; padding: 2rem;
+  }
+  .value-num { font-family: var(--font-head); font-size: 2.5rem; font-weight: 700; color: rgba(200,150,62,0.2); line-height: 1; margin-bottom: 0.5rem; }
+  .value-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 600; color: var(--navy); margin-bottom: 0.5rem; }
+  .value-desc { color: var(--gray); font-size: 0.875rem; line-height: 1.65; }
+
+  /* ── DETAIL PAGES ── */
+  .detail-hero { background: var(--navy); padding: 5rem 5%; }
+  .detail-back {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    color: rgba(255,255,255,0.5); font-size: 0.85rem;
+    cursor: pointer; margin-bottom: 2rem; transition: color 0.2s;
+    background: none; border: none; font-family: var(--font-body);
+  }
+  .detail-back:hover { color: var(--gold); }
+  .detail-hero h1 { font-family: var(--font-head); font-size: clamp(1.8rem,3vw,2.6rem); color: var(--white); margin-bottom: 1rem; max-width: 800px; }
+  .detail-meta { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .detail-body { padding: 4rem 5%; max-width: 1200px; margin: 0 auto; }
+  .content-prose { color: var(--navy); font-size: 1rem; line-height: 1.85; max-width: 760px; }
+  .content-prose h3 { font-family: var(--font-head); font-size: 1.4rem; margin: 2rem 0 0.75rem; }
+  .content-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.4rem; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy); color: rgba(255,255,255,0.5);
+    padding: 4rem 5% 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+  .footer-brand .nav-logo { display: block; margin-bottom: 1rem; font-size: 1.4rem; }
+  .footer-brand p { font-size: 0.875rem; line-height: 1.7; max-width: 280px; }
+  .footer-col h4 { color: var(--white); font-size: 0.85rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+  .footer-col a { display: block; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 0.875rem; margin-bottom: 0.6rem; transition: color 0.2s; cursor: pointer; }
+  .footer-col a:hover { color: var(--gold); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.08); font-size: 0.82rem; }
+
+  /* ── STATES ── */
+  .empty-state { text-align: center; padding: 4rem; color: var(--gray); }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .error-state { text-align: center; padding: 4rem; color: #c62828; }
+
+  /* ── NOTIFICATION ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--navy); color: var(--white);
+    padding: 1rem 1.5rem; border-radius: 6px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    border-left: 4px solid var(--gold);
+    transform: translateX(120%); transition: transform 0.3s;
+    z-index: 9999; font-size: 0.875rem; max-width: 320px;
+  }
+  #toast.show { transform: translateX(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-stats { display: none; }
+    .contact-grid { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .footer-grid { grid-template-columns: 1fr; }
+    section { padding: 4rem 5%; }
+  }
+
+  /* ── ANIMATIONS ── */
+  .fade-in { animation: fadeIn 0.6s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .stagger > * { animation: fadeIn 0.5s ease both; }
+  .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+  .stagger > *:nth-child(2) { animation-delay: 0.1s; }
+  .stagger > *:nth-child(3) { animation-delay: 0.15s; }
+  .stagger > *:nth-child(4) { animation-delay: 0.2s; }
+  .stagger > *:nth-child(5) { animation-delay: 0.25s; }
+  .stagger > *:nth-child(6) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a class="nav-logo" onclick="showPage('home')"><span>Com</span>ex</a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')" data-page="home">Home</a></li>
+    <li><a onclick="showPage('services')" data-page="services">Services</a></li>
+    <li><a onclick="showPage('cases')" data-page="cases">Case Studies</a></li>
+    <li><a onclick="showPage('insights')" data-page="insights">Insights</a></li>
+    <li><a onclick="showPage('about')" data-page="about">About</a></li>
+    <li><a onclick="showPage('contact')" data-page="contact">Contact</a></li>
+  </ul>
+  <button class="nav-cta" onclick="showPage('contact')">Get in Touch</button>
+  <div class="hamburger" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ════════════════════════════════════ HOME PAGE -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="fade-in">
+        <span class="hero-tag">Data Science Consulting</span>
+        <h1 class="hero-title">
+          Transforming Data into<br/><em>Strategic Advantage</em>
+        </h1>
+        <p class="hero-sub">
+          SMARTLINKS delivers end-to-end data science, cloud infrastructure, and AI solutions that help enterprises unlock the full value of their data.
+        </p>
+        <div class="hero-actions">
+          <button class="btn-primary" onclick="showPage('cases')">View Case Studies</button>
+          <button class="btn-outline" onclick="showPage('contact')">Start a Project</button>
+        </div>
+      </div>
+      <div class="hero-stats stagger">
+        <div class="stat-card">
+          <div class="stat-num">150+</div>
+          <div class="stat-label">Projects Delivered</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">40+</div>
+          <div class="stat-label">Enterprise Clients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">98%</div>
+          <div class="stat-label">Client Retention</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">12+</div>
+          <div class="stat-label">Industries Served</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Services -->
+  <section id="services-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">What We Do</span>
+        <h2 class="section-title">Our Core Services</h2>
+        <p class="section-sub">From cloud infrastructure to AI, we deliver comprehensive technology solutions tailored to your business goals.</p>
+      </div>
+      <div id="home-services" class="services-grid stagger">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem">
+        <button class="btn-primary" onclick="showPage('services')">View All Services</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Case Studies -->
+  <section style="background:var(--white);padding:6rem 5%">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Our Work</span>
+        <h2 class="section-title">Featured Case Studies</h2>
+        <p class="section-sub">Real results from real engagements across industries.</p>
+      </div>
+      <div id="home-cases" class="cases-grid stagger">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem">
+        <button class="btn-primary" onclick="showPage('cases')">All Case Studies</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section id="testimonials-section">
+    <div class="container">
+      <div class="section-header centered">
+        <span class="section-tag">Client Voices</span>
+        <h2 class="section-title">What Our Clients Say</h2>
+        <p class="section-sub">Trusted by enterprises across Africa and beyond.</p>
+      </div>
+      <div id="home-testimonials" class="testi-grid stagger">
+        <div class="skeleton skeleton-card" style="height:200px;background:rgba(255,255,255,0.07)"></div>
+        <div class="skeleton skeleton-card" style="height:200px;background:rgba(255,255,255,0.07)"></div>
+        <div class="skeleton skeleton-card" style="height:200px;background:rgba(255,255,255,0.07)"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Insights -->
+  <section id="insights-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Knowledge Hub</span>
+        <h2 class="section-title">Latest Insights</h2>
+        <p class="section-sub">Thought leadership from our team of experts.</p>
+      </div>
+      <div id="home-posts" class="posts-grid stagger">
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+      </div>
+      <div style="text-align:center;margin-top:2.5rem">
+        <button class="btn-primary" onclick="showPage('insights')">All Insights</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact CTA -->
+  <section style="background:var(--navy);padding:5rem 5%;text-align:center">
+    <span class="section-tag">Ready to Start?</span>
+    <h2 style="font-family:var(--font-head);font-size:clamp(1.8rem,3vw,2.6rem);color:var(--white);margin:0.5rem 0 1rem">Let's Build Something Remarkable</h2>
+    <p style="color:rgba(255,255,255,0.55);max-width:500px;margin:0 auto 2rem;line-height:1.7">Tell us about your data challenge and we'll put together a tailored solution within 24 hours.</p>
+    <button class="btn-primary" onclick="showPage('contact')">Start a Conversation</button>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════ SERVICES PAGE -->
+<div id="page-services" class="page">
+  <div class="about-hero">
+    <h1>Our Services</h1>
+    <p>Comprehensive data and technology solutions built for enterprise scale.</p>
+  </div>
+  <section style="background:var(--white)">
+    <div class="container">
+      <div id="all-services" class="services-grid stagger">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════ SERVICE DETAIL -->
+<div id="page-service-detail" class="page">
+  <div class="detail-hero">
+    <div class="container">
+      <button class="detail-back" onclick="showPage('services')">← Back to Services</button>
+      <div id="service-detail-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════ CASE STUDIES PAGE -->
+<div id="page-cases" class="page">
+  <div class="about-hero">
+    <h1>Case Studies</h1>
+    <p>Real-world results from our engagements across industries and regions.</p>
+  </div>
+  <section style="background:var(--white)">
+    <div class="container">
+      <div id="all-cases" class="cases-grid stagger">
+        <div class="skeleton skeleton-card" style="height:280px"></div>
+        <div class="skeleton skeleton-card" style="height:280px"></div>
+        <div class="skeleton skeleton-card" style="height:280px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════ CASE DETAIL -->
+<div id="page-case-detail" class="page">
+  <div class="detail-hero">
+    <div class="container">
+      <button class="detail-back" onclick="showPage('cases')">← Back to Case Studies</button>
+      <div id="case-detail-content"></div>
+    </div>
+  </div>
+  <div class="detail-body" id="case-detail-body"></div>
+</div>
+
+<!-- ════════════════════════════════════ INSIGHTS PAGE -->
+<div id="page-insights" class="page">
+  <div class="about-hero">
+    <h1>Insights & Thought Leadership</h1>
+    <p>Expert perspectives on data, cloud, AI, and digital transformation.</p>
+  </div>
+  <section id="insights-section" style="background:var(--white)">
+    <div class="container">
+      <div id="all-posts" class="posts-grid stagger">
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+        <div class="skeleton skeleton-card" style="height:300px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════ POST DETAIL -->
+<div id="page-post-detail" class="page">
+  <div class="detail-hero">
+    <div class="container">
+      <button class="detail-back" onclick="showPage('insights')">← Back to Insights</button>
+      <div id="post-detail-content"></div>
+    </div>
+  </div>
+  <div class="detail-body" id="post-detail-body"></div>
+</div>
+
+<!-- ════════════════════════════════════ ABOUT PAGE -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <h1>About SMARTLINKS</h1>
+    <p>We are a team of data scientists, engineers, and consultants helping organisations harness the power of their data.</p>
+  </div>
+
+  <section style="background:var(--white)">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Our Values</span>
+        <h2 class="section-title">What Drives Us</h2>
+      </div>
+      <div class="about-values">
+        <div class="value-card"><div class="value-num">01</div><div class="value-title">Data Integrity</div><div class="value-desc">We believe in clean, reliable data as the foundation of every decision.</div></div>
+        <div class="value-card"><div class="value-num">02</div><div class="value-title">Client Partnership</div><div class="value-desc">We embed ourselves in your team, working as true partners not just vendors.</div></div>
+        <div class="value-card"><div class="value-num">03</div><div class="value-title">Innovation</div><div class="value-desc">We stay at the frontier of technology so you don't have to.</div></div>
+        <div class="value-card"><div class="value-num">04</div><div class="value-title">Measurable Impact</div><div class="value-desc">Every engagement is measured by the business value it creates.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--light)">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Leadership</span>
+        <h2 class="section-title">Our Leadership Team</h2>
+      </div>
+      <div id="leadership-team" class="team-grid stagger">
+        <div class="skeleton skeleton-card" style="height:220px"></div>
+        <div class="skeleton skeleton-card" style="height:220px"></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:var(--white)">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Our People</span>
+        <h2 class="section-title">Meet the Team</h2>
+      </div>
+      <div id="all-team" class="team-grid stagger">
+        <div class="skeleton skeleton-card" style="height:220px"></div>
+        <div class="skeleton skeleton-card" style="height:220px"></div>
+        <div class="skeleton skeleton-card" style="height:220px"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════════════════════════════════════ CONTACT PAGE -->
+<div id="page-contact" class="page">
+  <div class="about-hero">
+    <h1>Get in Touch</h1>
+    <p>Ready to transform your data strategy? Let's talk.</p>
+  </div>
+  <section id="contact-section">
+    <div class="container">
+      <div class="contact-grid">
+        <div class="contact-info">
+          <h2>We'd Love to Hear From You</h2>
+          <p>Whether you have a specific project in mind or just want to explore what's possible, our team will get back to you within 24 hours.</p>
+          <div class="contact-detail">
+            <div class="contact-icon">📍</div>
+            <div class="contact-text">
+              <strong>Office</strong>
+              <span>Nairobi, Kenya</span>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-icon">📧</div>
+            <div class="contact-text">
+              <strong>Email</strong>
+              <span>hello@smartlinks.co</span>
+            </div>
+          </div>
+          <div class="contact-detail">
+            <div class="contact-icon">⏱️</div>
+            <div class="contact-text">
+              <strong>Response Time</strong>
+              <span>Within 24 business hours</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name *</label>
+              <input type="text" id="lead-first-name" placeholder="John"/>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <input type="text" id="lead-last-name" placeholder="Doe"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Email Address *</label>
+            <input type="email" id="lead-email" placeholder="john@company.com"/>
+          </div>
+          <div class="form-group">
+            <label>Company</label>
+            <input type="text" id="lead-company" placeholder="Your Company"/>
+          </div>
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="tel" id="lead-phone" placeholder="+254 700 000 000"/>
+          </div>
+          <div class="form-group">
+            <label>Service of Interest</label>
+            <select id="lead-service">
+              <option value="">— Select a service —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="lead-message" placeholder="Tell us about your project or challenge..."></textarea>
+          </div>
+          <button class="form-submit" id="lead-submit" onclick="submitLead()">Send Message</button>
+          <div id="form-feedback"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="nav-logo" onclick="showPage('home')"><span>Com</span>ex</a>
+        <p>Enterprise data science, cloud, and AI consulting. Transforming organisations through intelligent use of data.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Services</h4>
+        <a onclick="showPage('services')">Cloud Infrastructure</a>
+        <a onclick="showPage('services')">Data Analytics</a>
+        <a onclick="showPage('services')">AI & Machine Learning</a>
+        <a onclick="showPage('services')">Cybersecurity</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a onclick="showPage('about')">About Us</a>
+        <a onclick="showPage('cases')">Case Studies</a>
+        <a onclick="showPage('insights')">Insights</a>
+        <a onclick="showPage('contact')">Contact</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <a href="#">LinkedIn</a>
+        <a href="#">Twitter</a>
+        <a href="#">GitHub</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 SMARTLINKS. All rights reserved.</span>
+      <span>Built on data. Driven by results.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const API = 'http://localhost:3000/api';
+
+// ── ICON MAP ──
+const iconMap = {
+  cloud:'☁️', chart:'📊', robot:'🤖', shield:'🛡️',
+  database:'🗄️', gear:'⚙️', default:'🔷'
+};
+
+// ── ROUTER ──
+let loadedPages = new Set();
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('data-page') === name);
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (!loadedPages.has(name)) { loadedPages.add(name); loadPage(name); }
+}
+
+async function loadPage(name) {
+  switch(name) {
+    case 'home':    await loadHome(); break;
+    case 'services': await loadAllServices(); break;
+    case 'cases':   await loadAllCases(); break;
+    case 'insights': await loadAllPosts(); break;
+    case 'about':   await loadAbout(); break;
+    case 'contact': await loadContactServices(); break;
+  }
+}
+
+// ── FETCH HELPER ──
+async function apiFetch(path) {
+  try {
+    const r = await fetch(API + path);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    return d.success ? d.data : [];
+  } catch(e) { return null; }
+}
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ── STARS ──
+function stars(n) {
+  return '★'.repeat(n||5) + '☆'.repeat(5-(n||5));
+}
+
+// ── INITIALS ──
+function initials(name) {
+  return name.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+}
+
+// ── FORMAT DATE ──
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+// ══════════════════════════ HOME
+async function loadHome() {
+  const [services, cases, testimonials, posts] = await Promise.all([
+    apiFetch('/services/featured'),
+    apiFetch('/case-studies/featured'),
+    apiFetch('/testimonials/featured'),
+    apiFetch('/posts/featured'),
+  ]);
+  renderHomeServices(services);
+  renderHomeCases(cases);
+  renderHomeTestimonials(testimonials);
+  renderHomePosts(posts);
+}
+
+function renderHomeServices(data) {
+  const el = document.getElementById('home-services');
+  if (!data || !data.length) { el.innerHTML = emptyState('No services found'); return; }
+  el.innerHTML = data.map(s => serviceCardHTML(s)).join('');
+}
+
+function renderHomeCases(data) {
+  const el = document.getElementById('home-cases');
+  if (!data || !data.length) { el.innerHTML = emptyState('No case studies yet'); return; }
+  el.innerHTML = data.map(c => caseCardHTML(c)).join('');
+}
+
+function renderHomeTestimonials(data) {
+  const el = document.getElementById('home-testimonials');
+  if (!data || !data.length) { el.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:2rem">No testimonials yet.</p>'; return; }
+  el.innerHTML = data.map(t => `
+    <div class="testi-card">
+      <div class="testi-stars">${stars(t.rating)}</div>
+      <p class="testi-quote">${t.quote}</p>
+      <div class="testi-author">${t.author_name}</div>
+      <div class="testi-role">${t.author_role||''}</div>
+    </div>`).join('');
+}
+
+function renderHomePosts(data) {
+  const el = document.getElementById('home-posts');
+  if (!data || !data.length) { el.innerHTML = emptyState('No posts yet'); return; }
+  el.innerHTML = data.map(p => postCardHTML(p)).join('');
+}
+
+// ══════════════════════════ SERVICES
+async function loadAllServices() {
+  const data = await apiFetch('/services');
+  const el = document.getElementById('all-services');
+  if (!data || !data.length) { el.innerHTML = emptyState('No services found'); return; }
+  el.innerHTML = data.map(s => serviceCardHTML(s)).join('');
+}
+
+function serviceCardHTML(s) {
+  return `<div class="service-card" onclick="showServiceDetail('${s.slug}')">
+    <div class="service-icon">${iconMap[s.icon_name]||iconMap.default}</div>
+    <h3 class="service-title">${s.title}</h3>
+    <p class="service-desc">${s.short_desc||''}</p>
+    ${s.category ? `<span class="service-badge">${s.category}</span>` : ''}
+  </div>`;
+}
+
+async function showServiceDetail(slug) {
+  loadedPages.add('service-detail');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-service-detail').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const el = document.getElementById('service-detail-content');
+  el.innerHTML = '<div style="color:rgba(255,255,255,0.5)">Loading…</div>';
+  const data = await apiFetch('/services/' + slug);
+  if (!data) { el.innerHTML = '<p style="color:rgba(255,255,255,0.5)">Service not found.</p>'; return; }
+  el.innerHTML = `
+    <div class="hero-tag">${data.category||'Service'}</div>
+    <h1 style="font-family:var(--font-head);font-size:clamp(1.8rem,3vw,2.6rem);color:var(--white);margin:0.75rem 0 1rem;max-width:700px">${data.title}</h1>
+    <p style="color:rgba(255,255,255,0.6);max-width:600px;line-height:1.75">${data.full_desc||data.short_desc||''}</p>`;
+}
+
+// ══════════════════════════ CASE STUDIES
+async function loadAllCases() {
+  const data = await apiFetch('/case-studies');
+  const el = document.getElementById('all-cases');
+  if (!data || !data.length) { el.innerHTML = emptyState('No case studies yet'); return; }
+  el.innerHTML = data.map(c => caseCardHTML(c)).join('');
+}
+
+function caseCardHTML(c) {
+  return `<div class="case-card" onclick="showCaseDetail('${c.slug}')">
+    <div class="case-banner">${c.banner_emoji||'📊'}</div>
+    <div class="case-body">
+      <div class="case-meta">
+        ${c.industry ? `<span class="tag-pill">${c.industry}</span>` : ''}
+        ${c.country  ? `<span class="tag-pill">${c.country}</span>`  : ''}
+        ${c.service_title ? `<span class="tag-pill">${c.service_title}</span>` : ''}
+      </div>
+      <h3 class="case-title">${c.title}</h3>
+      <p class="case-client">${c.client_name||''}</p>
+      ${c.key_metric ? `<div class="case-metric">📈 ${c.key_metric}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+async function showCaseDetail(slug) {
+  loadedPages.add('case-detail');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-case-detail').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const h = document.getElementById('case-detail-content');
+  const b = document.getElementById('case-detail-body');
+  h.innerHTML = '<div style="color:rgba(255,255,255,0.5)">Loading…</div>';
+  b.innerHTML = '';
+  const c = await apiFetch('/case-studies/' + slug);
+  if (!c) { h.innerHTML = '<p style="color:rgba(255,255,255,0.5)">Not found.</p>'; return; }
+  h.innerHTML = `
+    <div class="detail-meta">
+      ${c.industry ? `<span class="tag-pill" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7)">${c.industry}</span>` : ''}
+      ${c.country  ? `<span class="tag-pill" style="background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7)">${c.country}</span>` : ''}
+    </div>
+    <h1 style="font-family:var(--font-head);font-size:clamp(1.8rem,3vw,2.6rem);color:var(--white);margin:1rem 0 0.5rem">${c.title}</h1>
+    <p style="color:var(--gold);font-weight:600">${c.client_name||''} ${c.service_title ? '· '+c.service_title : ''}</p>
+    ${c.key_metric ? `<p style="color:rgba(255,255,255,0.6);margin-top:0.5rem">📈 ${c.key_metric}</p>` : ''}`;
+  b.innerHTML = `<div class="content-prose">
+    ${c.challenge ? `<div class="content-label">The Challenge</div><h3>Challenge</h3><p>${c.challenge}</p>` : ''}
+    ${c.solution  ? `<div class="content-label" style="margin-top:2rem">Our Solution</div><h3>Solution</h3><p>${c.solution}</p>`  : ''}
+    ${c.results   ? `<div class="content-label" style="margin-top:2rem">Results</div><h3>Results</h3><p>${c.results}</p>`   : ''}
+  </div>`;
+}
+
+// ══════════════════════════ POSTS
+async function loadAllPosts() {
+  const data = await apiFetch('/posts');
+  const el = document.getElementById('all-posts');
+  if (!data || !data.length) { el.innerHTML = emptyState('No posts yet'); return; }
+  el.innerHTML = data.map(p => postCardHTML(p)).join('');
+}
+
+function postCardHTML(p) {
+  return `<div class="post-card" onclick="showPostDetail('${p.slug}')">
+    <div class="post-thumb">
+      ${p.category ? `<span class="post-category">${p.category}</span>` : ''}
+    </div>
+    <div class="post-body">
+      <h3 class="post-title">${p.title}</h3>
+      <p class="post-excerpt">${p.excerpt||''}</p>
+      <div class="post-footer">
+        <span class="post-author">${p.author_name||'Comex Team'}</span>
+        <span class="post-read">${p.read_time_mins ? p.read_time_mins+' min read' : fmtDate(p.published_at)}</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+async function showPostDetail(slug) {
+  loadedPages.add('post-detail');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-post-detail').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  const h = document.getElementById('post-detail-content');
+  const b = document.getElementById('post-detail-body');
+  h.innerHTML = '<div style="color:rgba(255,255,255,0.5)">Loading…</div>';
+  b.innerHTML = '';
+  const post = await apiFetch('/posts/' + slug);
+  if (!post) { h.innerHTML = '<p style="color:rgba(255,255,255,0.5)">Post not found.</p>'; return; }
+  h.innerHTML = `
+    ${post.category ? `<div class="hero-tag">${post.category}</div>` : ''}
+    <h1 style="font-family:var(--font-head);font-size:clamp(1.8rem,3vw,2.6rem);color:var(--white);margin:0.75rem 0 1rem;max-width:800px">${post.title}</h1>
+    <p style="color:rgba(255,255,255,0.5)">By ${post.author_name||'Comex Team'} · ${fmtDate(post.published_at)} ${post.read_time_mins ? '· '+post.read_time_mins+' min read' : ''}</p>`;
+  b.innerHTML = `<div class="content-prose">
+    ${post.excerpt ? `<p style="font-size:1.1rem;font-weight:500;color:var(--navy);margin-bottom:2rem">${post.excerpt}</p>` : ''}
+    ${post.content ? `<p>${post.content.replace(/\n/g,'</p><p>')}</p>` : '<p style="color:var(--gray)">Full content not available.</p>'}
+  </div>`;
+}
+
+// ══════════════════════════ ABOUT
+async function loadAbout() {
+  const [leadership, team] = await Promise.all([
+    apiFetch('/team/leadership'),
+    apiFetch('/team'),
+  ]);
+  renderTeam('leadership-team', leadership);
+  renderTeam('all-team', team);
+}
+
+function renderTeam(elId, data) {
+  const el = document.getElementById(elId);
+  if (!data || !data.length) { el.innerHTML = emptyState('No team members found'); return; }
+  el.innerHTML = data.map(m => `
+    <div class="team-card">
+      <div class="team-avatar">${initials(m.full_name)}</div>
+      <div class="team-name">${m.full_name}</div>
+      <div class="team-role">${m.role}</div>
+      ${m.department ? `<div class="team-dept">${m.department}</div>` : ''}
+      ${m.bio ? `<p class="team-bio">${m.bio}</p>` : ''}
+      ${m.is_leadership ? `<span class="leadership-badge">Leadership</span>` : ''}
+    </div>`).join('');
+}
+
+// ══════════════════════════ CONTACT
+async function loadContactServices() {
+  const data = await apiFetch('/services');
+  const sel = document.getElementById('lead-service');
+  if (data && data.length) {
+    data.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s.id; o.textContent = s.title;
+      sel.appendChild(o);
+    });
+  }
+}
+
+async function submitLead() {
+  const btn = document.getElementById('lead-submit');
+  const fb  = document.getElementById('form-feedback');
+  const first = document.getElementById('lead-first-name').value.trim();
+  const email = document.getElementById('lead-email').value.trim();
+  if (!first || !email) {
+    fb.innerHTML = '<div class="form-message error">Please fill in your first name and email.</div>';
+    return;
+  }
+  btn.disabled = true; btn.textContent = 'Sending…';
+  try {
+    const r = await fetch(API + '/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        first_name: first,
+        last_name:  document.getElementById('lead-last-name').value.trim(),
+        email,
+        company:    document.getElementById('lead-company').value.trim(),
+        phone:      document.getElementById('lead-phone').value.trim(),
+        message:    document.getElementById('lead-message').value.trim(),
+        service_id: document.getElementById('lead-service').value || null,
+        source: 'contact_form'
+      })
+    });
+    const d = await r.json();
+    if (d.success) {
+      fb.innerHTML = '<div class="form-message success">✓ Message sent! We\'ll be in touch within 24 hours.</div>';
+      ['lead-first-name','lead-last-name','lead-email','lead-company','lead-phone','lead-message'].forEach(id => document.getElementById(id).value='');
+      document.getElementById('lead-service').selectedIndex = 0;
+      toast('Thank you! Your message has been received.');
+    } else {
+      fb.innerHTML = `<div class="form-message error">${d.error||'Something went wrong.'}</div>`;
+    }
+  } catch(e) {
+    fb.innerHTML = '<div class="form-message error">Could not reach the server. Make sure your API is running on localhost:3000.</div>';
+  }
+  btn.disabled = false; btn.textContent = 'Send Message';
+}
+
+// ══════════════════════════ HELPERS
+function emptyState(msg) {
+  return `<div class="empty-state"><div class="empty-icon">📭</div><p>${msg}</p></div>`;
+}
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+});
+
+function toggleMobileMenu() {
+  const links = document.querySelector('.nav-links');
+  if (links.style.display === 'flex') {
+    links.style.display = 'none';
+  } else {
+    links.style.cssText = 'display:flex;flex-direction:column;position:fixed;top:68px;left:0;right:0;background:var(--navy);padding:2rem;gap:1.5rem;z-index:999;border-bottom:1px solid var(--border)';
+  }
+}
+
+// ── BOOT ──
+loadPage('home');
+</script>
+</body>
+</html>
